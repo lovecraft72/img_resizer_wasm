@@ -16,6 +16,15 @@
   });
 
   async function showImageFromInput() {
+    if (
+      files[0] &&
+      (files[0].type.includes("webp") ||
+        files[0].type.includes("heic") ||
+        files[0].type.includes("avif"))
+    ) {
+      alert("Sorry, this image type is not currently supported");
+      return;
+    }
     if (files[0] && files[0].type.startsWith("image")) {
       const buffer = await files[0].arrayBuffer();
       showImageFromArrayBuffer(buffer, files[0].type);
@@ -83,7 +92,12 @@
       imgSettings.height,
       imgSettings.width,
     );
-    showImageFromArrayBuffer(res.buffer, "image/jpeg", false);
+    try {
+      showImageFromArrayBuffer(res.buffer, "image/jpeg", false);
+    } catch (error) {
+      alert("Sorry, something went wrong");
+    }
+
     imgSettings.goFuncActive = false;
   }
 
@@ -108,7 +122,7 @@
   <div class="h-[40vh] w-screen flex items-center justify-center">
     <img
       bind:this={imgElement}
-      class="max-w-[90%] max-h-full object-contain ring-2 drop-shadow-md ring-offset-4"
+      class={`max-w-[90%] max-h-full ${imgSettings.height > imgSettings.width ? "h-full" : "min-w-[90%] md:min-w-auto"} object-contain ring-2 drop-shadow-md ring-offset-4`}
       src=""
       alt="imge"
     />
@@ -150,17 +164,18 @@
         type="number"
         placeholder="height"
         maxlength="10000"
-        class="ring-1 rounded-2xl px-2 py-1 mx-2"
+        class="w-[36vw] md:w-auto ring-1 rounded-2xl px-2 py-1 mx-2"
         oninput={() => {
           inputValuesChanged({ h: imgSettings.height });
         }}
         bind:value={imgSettings.height}
       />
+      X
       <input
         type="number"
         maxlength="10000"
         placeholder="width"
-        class="ring-1 rounded-2xl px-2 py-1 mx-2"
+        class="w-[36vw] md:w-auto ring-1 rounded-2xl px-2 py-1 mx-2"
         oninput={() => {
           inputValuesChanged({ w: imgSettings.width });
         }}
